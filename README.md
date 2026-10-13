@@ -8,7 +8,7 @@
 
 문제에 맞는 언어와 도구를 선택해 웹·앱 개발, 서버 구축, 데이터 이관과 서비스 연동을 담당해 왔습니다. 현재는 개선 과제를 직접 제안하고 경영진과 협의해 구현합니다.
 
-[이력서 · 경력기술서](resume.md) · [PDF 내려받기 · 5쪽](resume.pdf) · [연락하기](mailto:dev.kku@gmail.com)
+[웹 이력서](https://dev-kku.github.io/dev-kku/) · [경력기술서](resume.md) · [PDF · 5쪽](https://dev-kku.github.io/dev-kku/resume.pdf) · [연락하기](mailto:dev.kku@gmail.com)
 
 <br clear="all" />
 
