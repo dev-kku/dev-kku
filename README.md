@@ -1,6 +1,6 @@
-<img src="assets/profile.jpg" alt="김현준 프로필 사진" width="146" align="right" />
-
 # 김현준 | Java · Spring 백엔드 개발자
+
+<img src="assets/profile.jpg" alt="김현준 프로필 사진" width="146" align="right" />
 
 **운영 문제를 찾아, 서비스 구조와 업무 흐름을 개선합니다.**
 
