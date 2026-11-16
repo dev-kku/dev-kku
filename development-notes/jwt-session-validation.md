@@ -34,7 +34,22 @@
 
 Redis를 확인하지 못하면 요청을 허용하지 않는 방향입니다. 인증 상태를 확인할 수 없을 때 접근을 막는 대신 Redis 장애가 인증 가용성에 영향을 줄 수 있습니다. 운영 적용에는 예외 분류·관측과 장애 대응, 실제 저장소를 포함한 통합 검증이 별도로 필요합니다.
 
-이 글은 기존 변경 코드와 테스트 소스를 대조한 기록입니다. 이번 문서 작성 과정에서 테스트를 다시 실행하거나 부하 성능을 측정하지 않았습니다. 전체 보안 검증 완료나 운영 배포 완료를 뜻하지 않습니다.
+## 실행 검증
+
+2026.11.16에 인증 보강 커밋 `a963911d`를 별도 디렉터리에 추출하고 아래 명령으로 다시 실행했습니다. 원본의 진행 중 변경은 포함하지 않았습니다.
+
+```sh
+./gradlew test \
+  --tests '*JwtSessionValidatorTest' \
+  --tests '*JwtRequestFilterTest' \
+  --tests '*OnlineWebsocketHandlerTest' \
+  --tests '*MsgWebsocketHandlerTest' \
+  --no-daemon --offline
+```
+
+**11개 통과 · 실패 0 · 건너뜀 0.** JUnit XML 집계로 검증했습니다. 세션 검증 6개, HTTP 필터 3개, Netty 핸들러 2개입니다. 인증 실패 후 HTTP 요청 전달·메시지 저장 등 후속 동작이 실행되지 않는 조건도 포함합니다.
+
+실제 Redis 연결·JWT 암호 검증·운영 로그인 흐름·부하 성능은 이 테스트의 범위 밖입니다. [실행 결과와 커밋](verification.json)을 함께 보관했습니다.
 
 **근거:** 개인 프로젝트 커밋 `feda12cd`, `JwtSessionValidator`와 `JwtSessionValidatorTest`. 원본 저장소의 비공개 접근 정보·운영 설정은 포함하지 않았습니다.
 

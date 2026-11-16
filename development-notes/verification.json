@@ -1,0 +1,65 @@
+{
+  "verified_on": "2026-11-16",
+  "method": "git archive of pinned commits into isolated temporary directories; Gradle tests; JUnit XML totals",
+  "cases": [
+    {
+      "label": "jwt",
+      "sha": "a963911d93a3d95ab88ac6854a644d94146baa6a",
+      "suites": [
+        {
+          "name": "dev.kku.project.jjixa.domain.chat.netty.component.handler.MsgWebsocketHandlerTest",
+          "tests": "1",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0"
+        },
+        {
+          "name": "dev.kku.project.jjixa.domain.chat.netty.component.handler.OnlineWebsocketHandlerTest",
+          "tests": "1",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0"
+        },
+        {
+          "name": "dev.kku.project.jjixa.global.configuration.security.jwt.JwtRequestFilterTest",
+          "tests": "3",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0"
+        },
+        {
+          "name": "dev.kku.project.jjixa.global.configuration.security.jwt.JwtSessionValidatorTest",
+          "tests": "6",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0"
+        }
+      ],
+      "tests": 11,
+      "failures": 0,
+      "skipped": 0,
+      "command": "./gradlew test --tests '*JwtSessionValidatorTest' --tests '*JwtRequestFilterTest' --tests '*OnlineWebsocketHandlerTest' --tests '*MsgWebsocketHandlerTest' --no-daemon --offline",
+      "environment": "mocked token/session dependencies",
+      "scope": "selected test suites only"
+    },
+    {
+      "label": "querydsl",
+      "sha": "bb10e5d2facdf8e4fb82709e0a86ee3d275aa21b",
+      "suites": [
+        {
+          "name": "com.fancymerge.admin.infrastructure.persistence.QuerydslRepositoryTest",
+          "tests": "4",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0"
+        }
+      ],
+      "tests": 4,
+      "failures": 0,
+      "skipped": 0,
+      "command": "./gradlew test --tests '*QuerydslRepositoryTest' --no-daemon --offline",
+      "environment": "H2 in-memory database, local profile",
+      "scope": "selected test suites only"
+    }
+  ]
+}
