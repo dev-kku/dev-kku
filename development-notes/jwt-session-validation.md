@@ -16,6 +16,43 @@
 
 검증 메서드는 조회만 수행합니다. 세션 생성·저장은 이 경계의 책임으로 넣지 않았습니다. 검증에 실패한 요청이 새 세션을 만들면서 허용되는 흐름을 피하기 위한 구분입니다.
 
+## 구현에서 확인할 판단
+
+```mermaid
+flowchart LR
+    A[요청 토큰] --> B[토큰 해석 및 활성 확인]
+    B --> C[Redis 세션 조회]
+    C --> D[활성 상태와 식별자 대조]
+    D --> E[저장된 세션 반환]
+    B -->|실패| F[인증 결과 없음]
+    C -->|없음 또는 예외| F
+    D -->|불일치| F
+```
+
+아래는 테스트를 실행한 커밋 `a963911d`의 `validate` 메서드입니다. `isActive`는 데이터 존재·생성 상태·만료 시각을 검사하는 보조 메서드이며, 아래 발췌는 단독 실행 파일이 아닙니다.
+
+```java
+public Optional<RedisMemberTokenData> validate(String rawToken) {
+    try {
+        RedisMemberTokenData tokenData = tokenDecoder.decode(rawToken);
+        if (!isActive(tokenData)) {
+            return Optional.empty();
+        }
+
+        return memberTokenRepository.findById(tokenData.getId())
+                .filter(this::isActive)
+                .filter(storedToken -> tokenData.getId().equals(storedToken.getId()))
+                .filter(storedToken -> tokenData.getMemberCode().equals(storedToken.getMemberCode()));
+    } catch (RuntimeException exception) {
+        return Optional.empty();
+    }
+}
+```
+
+여기서 반환하는 값은 토큰에서 해석한 객체가 아니라 저장소에서 읽고 대조한 세션입니다. 인증 여부를 판단하는 경계에서 저장 호출을 하지 않는다는 조건은 모든 세션 검증 테스트 뒤에 `verify(memberTokenRepository, never()).save(any())`로 검사합니다.
+
+`RuntimeException`을 한 종류의 실패 결과로 모으는 현재 구현은 접근을 차단하지만, 토큰 오류와 저장소 장애를 호출 측에서 구분할 수 없습니다. 다음 개선은 이 거절 원칙을 유지하면서 오류 원인을 분류해 관측하는 것입니다. 토큰 원문을 로그에 남기는 방식은 사용하지 않는 방향으로 설계해야 합니다.
+
 ## 테스트가 확인하도록 작성된 조건
 
 | 입력·상태 | 기대 결과 |
@@ -51,6 +88,6 @@ Redis를 확인하지 못하면 요청을 허용하지 않는 방향입니다. �
 
 실제 Redis 연결·JWT 암호 검증·운영 로그인 흐름·부하 성능은 이 테스트의 범위 밖입니다. [실행 결과와 커밋](verification.json)을 함께 보관했습니다.
 
-**근거:** 개인 프로젝트 커밋 `feda12cd`, `JwtSessionValidator`와 `JwtSessionValidatorTest`. 원본 저장소의 비공개 접근 정보·운영 설정은 포함하지 않았습니다.
+**근거:** 최초 검토 커밋 `feda12cd`, 실행·코드 발췌 기준 커밋 `a963911d`, `JwtSessionValidator`와 `JwtSessionValidatorTest`. 원본 저장소의 비공개 접근 정보·운영 설정은 포함하지 않았습니다.
 
 [개발 기록 목록](README.md)

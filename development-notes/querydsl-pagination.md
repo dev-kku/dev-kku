@@ -15,6 +15,53 @@
 
 역할 조건은 `roles.any().roleCode`를 사용해 계정의 포함 여부를 판단합니다. 상세 조회는 선택된 계정의 전체 역할을 반환하는 데 집중합니다.
 
+## 결과를 작은 예제로 읽기
+
+아래 표는 테스트의 조건을 이해하기 위한 예시입니다. 운영 데이터가 아닙니다. ID는 표시 순서를 설명하기 위한 가상 값입니다.
+
+| 계정 ID | 활성 | 보유 역할 | 운영자 역할 검색 결과 |
+|---|---|---|---|
+| 103 | 예 | 운영자, 검토자 | 포함, 두 역할 모두 표시 |
+| 102 | 아니오 | 운영자 | 활성 조건에서 제외 |
+| 101 | 예 | 운영자 | 포함 |
+| 100 | 예 | 검토자 | 역할 조건에서 제외 |
+
+활성 운영자를 페이지 크기 1로 검색하면 첫 페이지는 103, 다음 페이지는 101, 총계는 2입니다. 첫 페이지의 역할은 **운영자·검토자 모두** 남아야 합니다. 세 번째 페이지는 비어도 총계 2를 유지해야 합니다. 이 조합이 회귀 테스트에서 확인하는 핵심입니다.
+
+## 실제 조회 코드
+
+테스트를 실행한 커밋 `bb10e5d2`의 `search` 메서드 중 조회 부분입니다. `filters`는 사용자명·이름·이메일·역할·활성·잠금 조건을 담은 배열입니다. 클래스 의존성과 조건 생성 코드는 생략한 발췌입니다.
+
+```java
+List<Long> pageIds = queryFactory
+        .select(adminUser.id)
+        .from(adminUser)
+        .where(filters)
+        .orderBy(adminUser.id.desc())
+        .offset(pageable.getOffset())
+        .limit(pageable.getPageSize())
+        .fetch();
+
+List<AdminUser> content = pageIds.isEmpty() ? List.of() : queryFactory
+        .selectFrom(adminUser)
+        .leftJoin(adminUser.roles, adminRole).fetchJoin()
+        .where(adminUser.id.in(pageIds))
+        .orderBy(adminUser.id.desc())
+        .distinct()
+        .fetch();
+
+Long total = queryFactory
+        .select(adminUser.count())
+        .from(adminUser)
+        .where(filters)
+        .fetchOne();
+return new PageImpl<>(content, pageable, total != null ? total : 0L);
+```
+
+두 조회에 같은 ID 내림차순을 명시합니다. `IN` 조건만으로 첫 조회의 순서가 보존된다고 기대하지 않기 때문입니다. `Pageable`의 임의 정렬을 구현한 것은 아니며, 이 사례의 정렬 기준은 ID 내림차순입니다.
+
+ID 조회·상세 조회·총계 조회 사이에 데이터가 바뀌는 상황은 별도 검증 대상입니다. 페이지 결과의 정확성을 논할 때에는 검색 조건뿐 아니라 트랜잭션 경계와 DB 격리 수준도 함께 확인해야 합니다.
+
 ## 회귀 테스트의 핵심
 
 테스트 데이터에는 검색 역할만 가진 계정, 추가 역할을 함께 가진 계정, 비활성 계정, 다른 역할만 가진 계정을 포함했습니다.
