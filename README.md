@@ -13,7 +13,7 @@
 
 **월 약 20만~30만 건을 처리하는 서비스의 개발·유지보수를 전담**합니다. 폐쇄망 환경에서 운영 문제를 개선 과제로 제안하고 경영진과 범위·우선순위를 협의해 실행했습니다. **Java·Spring을 주력으로, 필요한 기능에 맞춰 Android·Python·Flutter도 활용합니다.**
 
-[웹 이력서](https://dev-kku.github.io/dev-kku/) · [이력서 2쪽](https://dev-kku.github.io/dev-kku/resume-short.pdf) · [경력기술서 3쪽](https://dev-kku.github.io/dev-kku/career.pdf) · [합본 5쪽](https://dev-kku.github.io/dev-kku/resume.pdf)
+[웹 이력서](https://dev-kku.github.io/dev-kku/) · [이력서 2쪽](https://dev-kku.github.io/dev-kku/resume-short.pdf) · [경력기술서 2쪽](https://dev-kku.github.io/dev-kku/career.pdf) · [합본 4쪽](https://dev-kku.github.io/dev-kku/resume.pdf)
 
 ## 대표 경험
 
